@@ -1,0 +1,120 @@
+@model AgenceLocationVoiture.ViewModels.ClientRegistrationViewModel
+@{
+    ViewData["Title"] = "Inscription Client";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                        <h2>Inscription Client</h2>
+                        <p class="text-muted">Créez votre compte pour louer des véhicules</p>
+                    </div>
+
+                    <form asp-action="RegisterClient" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-user"></i> Informations personnelles</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Nom" class="form-label">Nom *</label>
+                                <input asp-for="Nom" class="form-control" />
+                                <span asp-validation-for="Nom" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Prenom" class="form-label">Prénom *</label>
+                                <input asp-for="Prenom" class="form-control" />
+                                <span asp-validation-for="Prenom" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateNaissance" class="form-label">Date de naissance *</label>
+                            <input asp-for="DateNaissance" type="date" class="form-control" />
+                            <span asp-validation-for="DateNaissance" class="text-danger"></span>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-id-card"></i> Permis de conduire</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="NumeroPermis" class="form-label">Numéro de permis *</label>
+                                <input asp-for="NumeroPermis" class="form-control" maxlength="12" placeholder="12 chiffres" />
+                                <span asp-validation-for="NumeroPermis" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DateObtentionPermis" class="form-label">Date d'obtention *</label>
+                                <input asp-for="DateObtentionPermis" type="date" class="form-control" />
+                                <span asp-validation-for="DateObtentionPermis" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-envelope"></i> Coordonnées</h5>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email *</label>
+                            <input asp-for="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Telephone" class="form-label">Téléphone *</label>
+                            <input asp-for="Telephone" type="tel" class="form-control" placeholder="55 555 555" />
+                            <span asp-validation-for="Telephone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Adresse" class="form-label">Adresse *</label>
+                            <input asp-for="Adresse" class="form-control" />
+                            <span asp-validation-for="Adresse" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Ville" class="form-label">Ville *</label>
+                                <input asp-for="Ville" class="form-control" />
+                                <span asp-validation-for="Ville" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CodePostal" class="form-label">Code postal *</label>
+                                <input asp-for="CodePostal" class="form-control" maxlength="5" />
+                                <span asp-validation-for="CodePostal" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-lock"></i> Sécurité</h5>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Mot de passe *</label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <small class="form-text text-muted">
+                                Minimum 8 caractères avec majuscule, minuscule, chiffre et caractère spécial
+                            </small>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label">Confirmer le mot de passe *</label>
+                            <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> S'inscrire
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p>Déjà inscrit ? <a asp-action="Login">Se connecter</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

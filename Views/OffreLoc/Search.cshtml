@@ -1,0 +1,242 @@
+@model AgenceLocationVoiture.ViewModels.RechercheViewModel
+@{
+    ViewData["Title"] = "Rechercher une offre";
+}
+
+<div class="container py-5">
+    <h1 class="mb-4"><i class="fas fa-search"></i> Recherche d'offres de location</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form asp-action="Search" method="get">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="DateDebut" class="form-label">Date de début</label>
+                        <input asp-for="DateDebut" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DateFin" class="form-label">Date de fin</label>
+                        <input asp-for="DateFin" type="date" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Ville" class="form-label">Ville</label>
+                        <input asp-for="Ville" class="form-control" placeholder="Tunis, Djerba..." />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PrixMax" class="form-label">Prix maximum (TND/jour)</label>
+                        <input asp-for="PrixMax" type="number" step="1" class="form-control" placeholder="100" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Marque" class="form-label">Marque</label>
+                        <input asp-for="Marque" class="form-control" placeholder="Renault, Peugeot..." />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Modele" class="form-label">Modèle</label>
+                        <input asp-for="Modele" class="form-control" placeholder="Clio, 208..." />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Categorie" class="form-label">Catégorie</label>
+                        <select asp-for="Categorie" class="form-select">
+                            <option value="">-- Toutes --</option>
+                            @foreach (var categorie in Enum.GetValues<AgenceLocationVoiture.Models.CategorieVoiture>())
+                            {
+                                <option value="@categorie">@categorie</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Carburant" class="form-label">Carburant</label>
+                        <select asp-for="Carburant" class="form-select">
+                            <option value="">-- Tous --</option>
+                            @foreach (var carburant in Enum.GetValues<AgenceLocationVoiture.Models.TypeCarburant>())
+                            {
+                                <option value="@carburant">@carburant</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Transmission" class="form-label">Transmission</label>
+                        <select asp-for="Transmission" class="form-select">
+                            <option value="">-- Toutes --</option>
+                            @foreach (var transmission in Enum.GetValues<AgenceLocationVoiture.Models.TypeTransmission>())
+                            {
+                                <option value="@transmission">@transmission</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="AnneeMin" class="form-label">Année minimum</label>
+                        <input asp-for="AnneeMin" type="number" class="form-control" placeholder="2020" min="2000" max="2030" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NombrePlacesMin" class="form-label">Nombre de places minimum</label>
+                        <select asp-for="NombrePlacesMin" class="form-select">
+                            <option value="">-- Peu importe --</option>
+                            <option value="2">2 places</option>
+                            <option value="4">4 places</option>
+                            <option value="5">5 places</option>
+                            <option value="7">7 places</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" name="AssuranceIncluse" value="true" class="form-check-input" id="AssuranceIncluse" 
+                                   @(Model.AssuranceIncluse == true ? "checked" : "") />
+                            <label for="AssuranceIncluse" class="form-check-label">Assurance incluse</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" name="LivraisonPossible" value="true" class="form-check-input" id="LivraisonPossible" 
+                                   @(Model.LivraisonPossible == true ? "checked" : "") />
+                            <label for="LivraisonPossible" class="form-check-label">Livraison possible</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                        <a asp-action="Search" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-redo"></i> Réinitialiser
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Resultats != null && Model.Resultats.Any())
+    {
+        <div class="mb-3">
+            <h4>@Model.TotalResultats résultat(s) trouvé(s)</h4>
+        </div>
+
+        <div class="row">
+            @foreach (var offre in Model.Resultats)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(offre.Voiture?.PhotoPrincipaleUrl))
+                        {
+                            <img src="@offre.Voiture.PhotoPrincipaleUrl" class="card-img-top" alt="@offre.Titre" />
+                        }
+
+                        <div class="card-body">
+                            <h5 class="card-title">@offre.Titre</h5>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-car"></i> @offre.Voiture?.Marque @offre.Voiture?.Modele<br />
+                                    <i class="fas fa-building"></i> @offre.AgenceNom<br />
+                                    @if (!string.IsNullOrEmpty(Model.Ville))
+                                    {
+                                        <i class="fas fa-map-marker-alt"></i><text> @Model.Ville</text>
+                                    }
+                                </small>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="h4 text-primary mb-0">@offre.PrixParJour TND</span>
+                                    <small class="text-muted">/jour</small>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@offre.Id" class="btn btn-primary">
+                                    Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Navigation des résultats">
+                <ul class="pagination justify-content-center">
+                    @if (Model.Page > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Search", new { 
+                                Ville = Model.Ville,
+                                DateDebut = Model.DateDebut,
+                                DateFin = Model.DateFin,
+                                PrixMax = Model.PrixMax,
+                                Marque = Model.Marque,
+                                Modele = Model.Modele,
+                                Categorie = Model.Categorie,
+                                Carburant = Model.Carburant,
+                                Transmission = Model.Transmission,
+                                AnneeMin = Model.AnneeMin,
+                                NombrePlacesMin = Model.NombrePlacesMin,
+                                AssuranceIncluse = Model.AssuranceIncluse,
+                                LivraisonPossible = Model.LivraisonPossible,
+                                Page = Model.Page - 1 
+                            })">
+                                Précédent
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Search", new { 
+                                Ville = Model.Ville,
+                                DateDebut = Model.DateDebut,
+                                DateFin = Model.DateFin,
+                                PrixMax = Model.PrixMax,
+                                Marque = Model.Marque,
+                                Modele = Model.Modele,
+                                Categorie = Model.Categorie,
+                                Carburant = Model.Carburant,
+                                Transmission = Model.Transmission,
+                                AnneeMin = Model.AnneeMin,
+                                NombrePlacesMin = Model.NombrePlacesMin,
+                                AssuranceIncluse = Model.AssuranceIncluse,
+                                LivraisonPossible = Model.LivraisonPossible,
+                                Page = i 
+                            })">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Search", new { 
+                                Ville = Model.Ville,
+                                DateDebut = Model.DateDebut,
+                                DateFin = Model.DateFin,
+                                PrixMax = Model.PrixMax,
+                                Marque = Model.Marque,
+                                Modele = Model.Modele,
+                                Categorie = Model.Categorie,
+                                Carburant = Model.Carburant,
+                                Transmission = Model.Transmission,
+                                AnneeMin = Model.AnneeMin,
+                                NombrePlacesMin = Model.NombrePlacesMin,
+                                AssuranceIncluse = Model.AssuranceIncluse,
+                                LivraisonPossible = Model.LivraisonPossible,
+                                Page = Model.Page + 1 
+                            })">
+                                Suivant
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+    else if (Model.Resultats != null)
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-search fa-3x mb-3"></i>
+            <h4>Aucun résultat trouvé</h4>
+            <p>Essayez de modifier vos critères de recherche.</p>
+        </div>
+    }
+</div>

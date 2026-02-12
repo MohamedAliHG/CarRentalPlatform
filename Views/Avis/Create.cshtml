@@ -1,0 +1,85 @@
+﻿@model AgenceLocationVoiture.ViewModels.CreateAvisViewModel
+@{
+    ViewData["Title"] = "Laisser un avis";
+    var agence = ViewBag.Agence as AgenceLocationVoiture.Models.Agence;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0"><i class="fas fa-comment"></i> Laisser un avis pour @agence?.NomAgence</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" asp-for="AgenceId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-star"></i> Note globale</h5>
+                        <div class="mb-4">
+                            <div class="rating-input">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" asp-for="Note" value="@i" id="star@(i)" />
+                                    <label for="star@(i)" title="@i étoile(s)">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                }
+                            </div>
+                            <span asp-validation-for="Note" class="text-danger"></span>
+                        </div>
+
+
+
+
+                        <h5 class="mb-3"><i class="fas fa-pen"></i> Votre commentaire</h5>
+                        <div class="mb-4">
+                            <textarea asp-for="Commentaire" class="form-control" rows="6" placeholder="Partagez votre expérience..." maxlength="1000"></textarea>
+                            <small class="form-text text-muted">Minimum 10 caractères, maximum 1000</small>
+                            <span asp-validation-for="Commentaire" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Votre avis sera visible publiquement après vérification.
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Agence" asp-action="Details" asp-route-id="@Model.AgenceId" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-paper-plane"></i> Publier l'avis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <style>
+        .rating-input {
+            direction: rtl;
+            display: inline-block;
+            font-size: 2rem;
+        }
+        .rating-input input {
+            display: none;
+        }
+        .rating-input label {
+            color: #ddd;
+            cursor: pointer;
+        }
+        .rating-input input:checked ~ label,
+        .rating-input label:hover,
+        .rating-input label:hover ~ label {
+            color: #ffc107;
+        }
+    </style>
+}

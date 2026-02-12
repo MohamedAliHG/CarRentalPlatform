@@ -1,0 +1,146 @@
+@model AgenceLocationVoiture.ViewModels.OffreLocViewModel
+@{
+    ViewData["Title"] = "Créer une offre";
+    var voitures = ViewBag.Voitures as IEnumerable<AgenceLocationVoiture.Models.Voiture>;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-tag"></i> Créer une offre de location</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-car"></i> Sélection du véhicule</h5>
+                        <div class="mb-4">
+                            <label asp-for="VoitureId" class="form-label">Véhicule *</label>
+                            <select asp-for="VoitureId" class="form-select">
+                                <option value="">-- Sélectionner un véhicule --</option>
+                                @if (voitures != null)
+                                {
+                                    @foreach (var voiture in voitures)
+                                    {
+                                        <option value="@voiture.Id">@voiture.Marque @voiture.Modele (@voiture.Annee) - @voiture.Immatriculation</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="VoitureId" class="text-danger"></span>
+                        </div>
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Informations de l'offre</h5>
+                        <div class="mb-3">
+                            <label asp-for="Titre" class="form-label">Titre *</label>
+                            <input asp-for="Titre" class="form-control" placeholder="Ex: Location Renault Clio - Idéale ville" />
+                            <span asp-validation-for="Titre" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description *</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Décrivez votre offre..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <h5 class="mb-3">Tarification</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PrixParJour" class="form-label">Prix par jour * (TND)</label>
+                                <input asp-for="PrixParJour" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="PrixParJour" class="text-danger"></span>
+                            </div>
+                           
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CautionMontant" class="form-label">Montant de la caution (TND)</label>
+                                <input asp-for="CautionMontant" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="CautionMontant" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FraisLivraison" class="form-label">Frais de livraison (TND)</label>
+                                <input asp-for="FraisLivraison" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="FraisLivraison" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3"><i class="fas fa-road"></i> Kilométrage</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="KilometrageInclus" class="form-label">Km inclus par jour *</label>
+                                <input asp-for="KilometrageInclus" type="number" class="form-control" />
+                                <span asp-validation-for="KilometrageInclus" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FraisKmSupplementaire" class="form-label">Frais km sup. (TND/km)</label>
+                                <input asp-for="FraisKmSupplementaire" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="FraisKmSupplementaire" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3"><i class="fas fa-user-check"></i> Conditions</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AgeMinimumConducteur" class="form-label">Âge minimum *</label>
+                                <input asp-for="AgeMinimumConducteur" type="number" class="form-control" value="21" />
+                                <span asp-validation-for="AgeMinimumConducteur" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AnciennetePermisMinimum" class="form-label">Ancienneté permis (années) *</label>
+                                <input asp-for="AnciennetePermisMinimum" type="number" class="form-control" value="1" />
+                                <span asp-validation-for="AnciennetePermisMinimum" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="AssuranceIncluse" type="checkbox" class="form-check-input" checked />
+                                    <label asp-for="AssuranceIncluse" class="form-check-label">Assurance incluse</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="LivraisonPossible" type="checkbox" class="form-check-input" />
+                                    <label asp-for="LivraisonPossible" class="form-check-label">Livraison possible</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3"><i class="fas fa-calendar-alt"></i> Période de disponibilité</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DateDebut" class="form-label">Date de début *</label>
+                                <input asp-for="DateDebut" type="date" class="form-control" />
+                                <span asp-validation-for="DateDebut" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DateFin" class="form-label">Date de fin *</label>
+                                <input asp-for="DateFin" type="date" class="form-control" />
+                                <span asp-validation-for="DateFin" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Agence" asp-action="Dashboard" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Créer l'offre
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

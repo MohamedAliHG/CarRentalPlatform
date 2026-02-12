@@ -1,0 +1,100 @@
+@model IEnumerable<AgenceLocationVoiture.Models.Agence>
+@{
+    ViewData["Title"] = "Gestion des agences";
+    var agencesNonVerifiees = Model.Where(a => !a.EstVerifiee).ToList();
+    var agencesVerifiees = Model.Where(a => a.EstVerifiee).ToList();
+    var agencesActives = Model.Where(a => a.EstActif).ToList();
+    var agencesInactives = Model.Where(a => !a.EstActif).ToList();
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-building"></i> Gestion des agences</h1>
+            <p class="text-muted">
+                Total : @Model.Count() agences | 
+                <span class="text-success">@agencesActives.Count actives</span> | 
+                <span class="text-danger">@agencesInactives.Count désactivées</span> |
+                <span class="text-warning">@agencesNonVerifiees.Count non vérifiées</span>
+            </p>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    @if (agencesNonVerifiees.Any())
+    {
+        <div class="alert alert-warning shadow-sm mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Agences en attente de vérification</h5>
+                    <p class="mb-0">@agencesNonVerifiees.Count agence(s) en attente de validation.</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (agencesInactives.Any())
+    {
+        <div class="alert alert-info shadow-sm mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Agences désactivées</h5>
+                    <p class="mb-0">@agencesInactives.Count agence(s) actuellement désactivée(s).</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <ul class="nav nav-tabs mb-4" id="agenceTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="toutes-tab" 
+                    data-bs-toggle="tab" data-bs-target="#toutes" type="button">
+                <i class="fas fa-list"></i> Toutes 
+                <span class="badge bg-secondary">@Model.Count()</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="actives-tab" 
+                    data-bs-toggle="tab" data-bs-target="#actives" type="button">
+                <i class="fas fa-check-circle"></i> Actives 
+                <span class="badge bg-success">@agencesActives.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="inactives-tab" 
+                    data-bs-toggle="tab" data-bs-target="#inactives" type="button">
+                <i class="fas fa-ban"></i> Désactivées 
+                <span class="badge bg-danger">@agencesInactives.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="non-verifiees-tab" 
+                    data-bs-toggle="tab" data-bs-target="#non-verifiees" type="button">
+                <i class="fas fa-clock"></i> Non vérifiées 
+                <span class="badge bg-warning text-dark">@agencesNonVerifiees.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="agenceTabsContent">
+        <div class="tab-pane fade show active" id="toutes">
+            @await Html.PartialAsync("_AgencesTablePartial", Model)
+        </div>
+
+        <div class="tab-pane fade" id="actives">
+            @await Html.PartialAsync("_AgencesTablePartial", agencesActives)
+        </div>
+
+        <div class="tab-pane fade" id="inactives">
+            @await Html.PartialAsync("_AgencesTablePartial", agencesInactives)
+        </div>
+
+        <div class="tab-pane fade" id="non-verifiees">
+            @await Html.PartialAsync("_AgencesTablePartial", agencesNonVerifiees)
+        </div>
+    </div>
+</div>

@@ -1,0 +1,255 @@
+@model AgenceLocationVoiture.ViewModels.AgenceViewModel
+@{
+    ViewData["Title"] = Model.NomAgence;
+    var voitures = ViewBag.Voitures as IEnumerable<AgenceLocationVoiture.Models.Voiture>;
+    var offres = ViewBag.Offres as IEnumerable<AgenceLocationVoiture.Models.OffreLoc>;
+    var avis = ViewBag.Avis as IEnumerable<AgenceLocationVoiture.Models.Avis>;
+}
+
+<div class="container py-4">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                    {
+                        <img src="@Model.LogoUrl" alt="@Model.NomAgence" class="img-fluid rounded" />
+                    }
+                    else
+                    {
+                        <div class="bg-light p-5 rounded">
+                            <i class="fas fa-building fa-5x text-muted"></i>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-9">
+                    <h1>
+                        @Model.NomAgence
+                        @if (Model.EstVerifiee)
+                        {
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle"></i> Vérifiée
+                            </span>
+                        }
+                    </h1>
+
+                    @if (Model.NoteMoyenne > 0)
+                    {
+                        <div class="mb-3">
+                            <span class="stars h4">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Model.NoteMoyenne)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else if (i - 0.5 <= Model.NoteMoyenne)
+                                    {
+                                        <i class="fas fa-star-half-alt"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                }
+                            </span>
+                            <span class="text-muted">(@Model.NoteMoyenne.ToString("0.0")) - @Model.NombreAvis avis</span>
+                        </div>
+                    }
+
+                    <p class="lead">@Model.Description</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-map-marker-alt text-primary"></i> <strong>Adresse :</strong><br />
+                            @Model.Adresse<br />
+                            @Model.CodePostal @Model.Ville</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="fas fa-phone text-primary"></i> <strong>Téléphone :</strong> @Model.Telephone</p>
+                            <p><i class="fas fa-envelope text-primary"></i> <strong>Email :</strong> @Model.Email</p>
+                            @if (!string.IsNullOrEmpty(Model.SiteWeb))
+                            {
+                                <p><i class="fas fa-globe text-primary"></i> <strong>Site web :</strong> <a href="@Model.SiteWeb" target="_blank">@Model.SiteWeb</a></p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-car fa-2x text-primary"></i>
+                                <h3 class="mb-0">@Model.NombreVoitures</h3>
+                                <small>Véhicules</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-tag fa-2x text-primary"></i>
+                                <h3 class="mb-0">@Model.NombreOffres</h3>
+                                <small>Offres actives</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-star fa-2x text-primary"></i>
+                                <h3 class="mb-0">@Model.NombreAvis</h3>
+                                <small>Avis clients</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (User.IsInRole("Client"))
+                    {
+                        <div class="mt-4">
+                            <a asp-controller="Avis" asp-action="Create" asp-route-agenceId="@Model.Id" class="btn btn-primary">
+                                <i class="fas fa-comment"></i> Laisser un avis
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#offres" type="button">
+                <i class="fas fa-tag"></i> Offres @(offres?.Count(o => o.EstActive) ?? 0)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#voitures" type="button">
+                <i class="fas fa-car"></i> Véhicules (@(voitures?.Count() ?? 0))
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#avis-tab" type="button">
+                <i class="fas fa-star"></i> Avis (@(avis?.Count() ?? 0))
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="offres">
+            @if (offres != null && offres.Any())
+            {
+               
+                <div class="row">
+                    @foreach (var offre in offres)
+                    {
+                        @if ( offre.EstActive==true)
+                        {
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@offre.Titre</h5>
+                                    <p class="card-text">@offre.Description</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h4 text-primary mb-0">@offre.PrixParJour TND/jour</span>
+                                        <a asp-controller="OffreLoc" asp-action="Details" asp-route-id="@offre.Id" class="btn btn-primary">
+                                            Voir détails
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aucune offre disponible pour le moment.
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="voitures">
+            @if (voitures != null && voitures.Any())
+            {
+                <div class="row">
+                    @foreach (var voiture in voitures)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                @if (!string.IsNullOrEmpty(voiture.PhotoPrincipaleUrl))
+                                {
+                                    <img src="@voiture.PhotoPrincipaleUrl" class="card-img-top" alt="@voiture.Marque @voiture.Modele" />
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title">@voiture.Marque @voiture.Modele</h5>
+                                    <p class="card-text">
+                                        <small>
+                                            <i class="fas fa-calendar"></i> @voiture.Annee<br />
+                                            <i class="fas fa-gas-pump"></i> @voiture.TypeCarburant<br />
+                                            <i class="fas fa-users"></i> @voiture.NombrePlaces places
+                                        </small>
+                                    </p>
+                                    <a asp-controller="Voiture" asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-outline-primary btn-sm">
+                                        Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aucun véhicule disponible.
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="avis-tab">
+            @if (avis != null && avis.Any())
+            {
+                foreach (var av in avis.OrderByDescending(a => a.DateAvis))
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">@av.Client?.Prenom @av.Client?.Nom</h6>
+                                    <span class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= av.Note)
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star"></i>
+                                            }
+                                        }
+                                    </span>
+                                </div>
+                                <small class="text-muted">@av.DateAvis.ToString("dd/MM/yyyy")</small>
+                            </div>
+                            <p class="mt-2 mb-0">@av.Commentaire</p>
+
+                            @if (!string.IsNullOrEmpty(av.ReponseAgence))
+                            {
+                                <div class="alert alert-light mt-3 mb-0">
+                                    <strong><i class="fas fa-reply"></i> Réponse de l'agence :</strong><br />
+                                    @av.ReponseAgence
+                                    <br /><small class="text-muted">@av.DateReponse?.ToString("dd/MM/yyyy")</small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aucun avis pour le moment. Soyez le premier à laisser un avis !
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+@model IEnumerable<AgenceLocationVoiture.Models.Agence>
+
+@if (Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>SIRET</th>
+                            <th>Ville</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Vérifiée</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var agence in Model.OrderByDescending(a => a.DateInscription))
+                        {
+                            <tr class="@(!agence.EstActif ? "table-danger" : !agence.EstVerifiee ? "table-warning" : "")">
+                                <td>
+                                    <strong>@agence.NomAgence</strong>
+                                    @if (agence.EstVerifiee)
+                                    {
+                                        <i class="fas fa-check-circle text-success ms-1" title="Vérifiée"></i>
+                                    }
+                                </td>
+                                <td>@agence.NumeroSiret</td>
+                                <td>@agence.Ville</td>
+                                <td>@agence.Email</td>
+                                <td>@agence.PhoneNumber</td>
+                                <td>
+                                    @if (agence.EstVerifiee)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Oui
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-clock"></i> Non
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (agence.EstActif)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-ban"></i> Désactivée
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-controller="Agence" asp-action="Details" asp-route-id="@agence.Id" 
+                                           class="btn btn-sm btn-info" title="Voir détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        @if (!agence.EstVerifiee && agence.EstActif)
+                                        {
+                                            <form asp-action="VerifyAgence" asp-route-id="@agence.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success" title="Vérifier"
+                                                        onclick="return confirm('Vérifier l\'agence @agence.NomAgence ?');">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        }
+
+                                        <form asp-action="ToggleAgenceStatus" asp-route-id="@agence.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            @if (agence.EstActif)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Désactiver"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir désactiver l\'agence @agence.NomAgence ? Elle ne pourra plus proposer d\'offres.');">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-success" title="Activer"
+                                                        onclick="return confirm('Réactiver l\'agence @agence.NomAgence ?');">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            }
+                                        </form>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Aucune agence dans cette catégorie.
+    </div>
+}

@@ -1,0 +1,88 @@
+@model IEnumerable<AgenceLocationVoiture.Models.DemandeLoc>
+@{
+    ViewData["Title"] = "Mes demandes";
+}
+
+<div class="container py-5">
+    <h1><i class="fas fa-envelope"></i> Mes demandes de location</h1>
+    <p class="lead">Suivez l'état de vos demandes</p>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Offre</th>
+                        <th>Période</th>
+                        @if (User.IsInRole("Agence"))
+                        {
+                            <th>Client</th>
+                        }
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var demande in Model)
+                    {
+                        <tr>
+                            <td>@demande.DateDemande.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <strong>@demande.OffreLoc?.Titre</strong><br />
+                                <small class="text-muted">@demande.OffreLoc?.Voiture?.Marque @demande.OffreLoc?.Voiture?.Modele</small>
+                            </td>
+                            <td>
+                                @demande.DateDebut.ToString("dd/MM/yy") - @demande.DateFin.ToString("dd/MM/yy")<br />
+                                <small class="text-muted">(@((demande.DateFin - demande.DateDebut).Days) jours)</small>
+                            </td>
+                            @if (User.IsInRole("Agence"))
+                            {
+                                <td>
+                                    @demande.Client?.Prenom @demande.Client?.Nom<br />
+                                    <small class="text-muted">@demande.Client?.PhoneNumber</small>
+                                </td>
+                            }
+                            <td>
+                                @if (demande.MontantTotal.HasValue)
+                                {
+                                    <strong>@demande.MontantTotal.Value TND</strong>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="@AgenceLocationVoiture.Helpers.EnumHelpers.GetStatutDemandeBadgeClass(demande.Statut)">
+                                    @AgenceLocationVoiture.Helpers.EnumHelpers.GetStatutDemandeLabel(demande.Statut)
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@demande.Id" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i> Détails
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h4>Aucune demande</h4>
+            <p>Vous n'avez pas encore de demandes de location.</p>
+            @if (User.IsInRole("Client"))
+            {
+                <a asp-controller="OffreLoc" asp-action="Index" class="btn btn-primary mt-3">
+                    <i class="fas fa-search"></i> Parcourir les offres
+                </a>
+            }
+        </div>
+    }
+</div>

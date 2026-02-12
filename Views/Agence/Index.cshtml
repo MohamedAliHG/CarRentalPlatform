@@ -1,0 +1,181 @@
+﻿@model AgenceLocationVoiture.Helpers.PaginatedList<AgenceLocationVoiture.ViewModels.AgenceViewModel>
+@{
+    ViewData["Title"] = "Agences";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="fas fa-building"></i> Nos Agences Partenaires</h1>
+            <p class="lead">Découvrez nos agences de location vérifiées</p>
+        </div>
+        <div class="col-md-4 text-end">
+            @if (!User.IsInRole("Agence") && !User.IsInRole("Admin"))
+            {
+                <a asp-controller="Account" asp-action="RegisterAgence" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Devenir partenaire
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" name="search" class="form-control" placeholder="Rechercher une agence..." value="@ViewBag.CurrentSearch" />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="ville" class="form-control" placeholder="Ville..." value="@ViewBag.CurrentVille" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Rechercher
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="mb-3">
+            <p class="text-muted">
+                <i class="fas fa-info-circle"></i> @Model.TotalItems agence(s) trouvée(s) - Page @Model.PageIndex sur @Model.TotalPages
+            </p>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var agence in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(agence.LogoUrl))
+                        {
+                            <img src="@agence.LogoUrl" class="card-img-top" alt="@agence.NomAgence" style="height: 200px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-building fa-5x text-muted"></i>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                @agence.NomAgence
+                                @if (agence.EstVerifiee)
+                                {
+                                    <i class="fas fa-check-circle text-success" title="Agence vérifiée"></i>
+                                }
+                            </h5>
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt text-primary"></i> @agence.Ville, @agence.CodePostal<br />
+                                <i class="fas fa-phone text-primary"></i> @agence.Telephone
+                            </p>
+
+                            @if (agence.NoteMoyenne > 0)
+                            {
+                                <div class="mb-2">
+                                    <span class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= agence.NoteMoyenne)
+                                            {
+                                                <i class="fas fa-star text-warning"></i>
+                                            }
+                                            else if (i - 0.5 <= agence.NoteMoyenne)
+                                            {
+                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star text-warning"></i>
+                                            }
+                                        }
+                                    </span>
+                                    <small class="text-muted">(@agence.NombreAvis avis)</small>
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-car"></i> @agence.NombreVoitures véhicules<br />
+                                        <i class="fas fa-tag"></i> @agence.NombreOffres offres
+                                    </small>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@agence.Id" class="btn btn-primary">
+                                    Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+     
+        @if (Model.TotalPages > 0)
+        {
+            <nav aria-label="Pagination des agences">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-pageNumber="@(Model.PageIndex - 1)"
+                           asp-route-search="@ViewBag.CurrentSearch"
+                           asp-route-ville="@ViewBag.CurrentVille">
+                            <i class="fas fa-chevron-left"></i> Précédent
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == 1 || i == Model.TotalPages || (i >= Model.PageIndex - 2 && i <= Model.PageIndex + 2))
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link" 
+                                   asp-action="Index" 
+                                   asp-route-pageNumber="@i"
+                                   asp-route-search="@ViewBag.CurrentSearch"
+                                   asp-route-ville="@ViewBag.CurrentVille">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        else if (i == Model.PageIndex - 3 || i == Model.PageIndex + 3)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link"  
+                           asp-action="Index" 
+                           asp-route-pageNumber="@(Model.PageIndex + 1)"
+                           asp-route-search="@ViewBag.CurrentSearch"
+                           asp-route-ville="@ViewBag.CurrentVille">
+                            Suivant <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h4>Aucune agence trouvée</h4>
+            <p>Essayez de modifier vos critères de recherche.</p>
+        </div>
+    }
+</div>
+

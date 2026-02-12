@@ -1,0 +1,221 @@
+@model IEnumerable<AgenceLocationVoiture.Models.Client>
+
+@if (Model.Any())
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Ville</th>
+                            <th>Date d'inscription</th>
+                            <th>Permis vérifié</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var client in Model.OrderByDescending(c => c.DateInscription))
+                        {
+                            <tr class="@(!client.EstActif ? "table-danger" : !client.PermisVerifie ? "table-warning" : "")">
+                                <td>
+                                    <strong>@client.Prenom @client.Nom</strong>
+                                    @if (client.PermisVerifie)
+                                    {
+                                        <i class="fas fa-check-circle text-success ms-1" title="Permis vérifié"></i>
+                                    }
+                                </td>
+                                <td>@client.Email</td>
+                                <td>@client.PhoneNumber</td>
+                                <td>@client.Ville</td>
+                                <td>@client.DateInscription.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (client.PermisVerifie)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check"></i> Oui
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-clock"></i> Non
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (client.EstActif)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle"></i> Actif
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-ban"></i> Désactivé
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-info" 
+                                                data-bs-toggle="modal" data-bs-target="#detailsModal@(client.Id)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+
+                                        @if (!client.PermisVerifie && client.EstActif)
+                                        {
+                                            <form asp-action="VerifyClient" asp-route-id="@client.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success" title="Vérifier le permis"
+                                                        onclick="return confirm('Vérifier le permis de @client.Prenom @client.Nom ?');">
+                                                    <i class="fas fa-id-card"></i>
+                                                </button>
+                                            </form>
+                                        }
+
+                                        <form asp-action="ToggleClientStatus" asp-route-id="@client.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            @if (client.EstActif)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-warning" title="Désactiver"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir désactiver @client.Prenom @client.Nom ?');">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-success" title="Réactiver"
+                                                        onclick="return confirm('Réactiver le compte de @client.Prenom @client.Nom ?');">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            }
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Aucun client dans cette catégorie.
+    </div>
+}
+
+@foreach (var client in Model)
+{
+    <div class="modal fade" id="detailsModal@(client.Id)" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user"></i> Détails du client
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Nom complet :</strong> @client.Prenom @client.Nom
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email :</strong> @client.Email
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Téléphone :</strong> @client.PhoneNumber
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date de naissance :</strong> @client.DateNaissance.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Adresse :</strong><br />
+                            @client.Adresse<br />
+                            @client.CodePostal @client.Ville
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Numéro de permis :</strong> @client.NumeroPermis
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date d'obtention :</strong> @client.DateObtentionPermis.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Permis vérifié :</strong>
+                            @if (client.PermisVerifie)
+                            {
+                                <span class="badge bg-success">Oui</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Non</span>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Statut :</strong>
+                            @if (client.EstActif)
+                            {
+                                <span class="badge bg-success">Actif</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Désactivé</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Date d'inscription :</strong> @client.DateInscription.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    @if (!client.PermisVerifie && client.EstActif)
+                    {
+                        <form asp-action="VerifyClient" asp-route-id="@client.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Vérifier le permis
+                            </button>
+                        </form>
+                    }
+                    <form asp-action="ToggleClientStatus" asp-route-id="@client.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        @if (client.EstActif)
+                        {
+                            <button type="submit" class="btn btn-warning" 
+                                    onclick="return confirm('Désactiver ce client ?');">
+                                <i class="fas fa-ban"></i> Désactiver
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-success" 
+                                    onclick="return confirm('Réactiver ce client ?');">
+                                <i class="fas fa-check-circle"></i> Réactiver
+                            </button>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

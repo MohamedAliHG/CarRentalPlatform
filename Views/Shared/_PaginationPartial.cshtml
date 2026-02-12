@@ -1,0 +1,55 @@
+@model dynamic
+@{
+    var routeValues = ViewContext.RouteData.Values;
+    var actionName = ViewBag.PaginationAction ?? routeValues["action"]?.ToString() ?? "Index";
+    var controllerName = routeValues["controller"]?.ToString();
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                <a class="page-link" 
+                   asp-controller="@controllerName"
+                   asp-action="@actionName" 
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   asp-all-route-data="@ViewBag.PaginationRouteValues">
+                    <i class="fas fa-chevron-left"></i> Précédent
+                </a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                if (i == 1 || i == Model.TotalPages || (i >= Model.PageIndex - 2 && i <= Model.PageIndex + 2))
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" 
+                           asp-controller="@controllerName"
+                           asp-action="@actionName" 
+                           asp-route-pageNumber="@i"
+                           asp-all-route-data="@ViewBag.PaginationRouteValues">
+                            @i
+                        </a>
+                    </li>
+                }
+                else if (i == Model.PageIndex - 3 || i == Model.PageIndex + 3)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                <a class="page-link" 
+                   asp-controller="@controllerName"
+                   asp-action="@actionName" 
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   asp-all-route-data="@ViewBag.PaginationRouteValues">
+                    Suivant <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

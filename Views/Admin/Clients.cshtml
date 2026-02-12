@@ -1,0 +1,99 @@
+@model IEnumerable<AgenceLocationVoiture.Models.Client>
+@{
+    ViewData["Title"] = "Gestion des clients";
+    var clientsActifs = Model.Where(c => c.EstActif).ToList();
+    var clientsInactifs = Model.Where(c => !c.EstActif).ToList();
+    var clientsNonVerifies = Model.Where(c => !c.PermisVerifie && c.EstActif).ToList();
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-users"></i> Gestion des clients</h1>
+            <p class="text-muted">
+                Total : @Model.Count() clients | 
+                <span class="text-success">@clientsActifs.Count actifs</span> | 
+                <span class="text-danger">@clientsInactifs.Count désactivés</span> |
+                <span class="text-warning">@clientsNonVerifies.Count non vérifiés</span>
+            </p>
+        </div>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+
+    @if (clientsNonVerifies.Any())
+    {
+        <div class="alert alert-warning shadow-sm mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Permis en attente de vérification</h5>
+                    <p class="mb-0">@clientsNonVerifies.Count client(s) en attente de validation de leur permis.</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (clientsInactifs.Any())
+    {
+        <div class="alert alert-info shadow-sm mb-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+                <div>
+                    <h5 class="mb-1">Clients désactivés</h5>
+                    <p class="mb-0">@clientsInactifs.Count client(s) actuellement désactivé(s).</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <ul class="nav nav-tabs mb-4" id="clientTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="tous-tab" 
+                    data-bs-toggle="tab" data-bs-target="#tous" type="button">
+                <i class="fas fa-list"></i> Tous 
+                <span class="badge bg-secondary">@Model.Count()</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="actifs-tab" 
+                    data-bs-toggle="tab" data-bs-target="#actifs" type="button">
+                <i class="fas fa-check-circle"></i> Actifs 
+                <span class="badge bg-success">@clientsActifs.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="inactifs-tab" 
+                    data-bs-toggle="tab" data-bs-target="#inactifs" type="button">
+                <i class="fas fa-ban"></i> Désactivés 
+                <span class="badge bg-danger">@clientsInactifs.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="non-verifies-tab" 
+                    data-bs-toggle="tab" data-bs-target="#non-verifies" type="button">
+                <i class="fas fa-clock"></i> Non vérifiés 
+                <span class="badge bg-warning text-dark">@clientsNonVerifies.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="clientTabsContent">
+        <div class="tab-pane fade show active" id="tous">
+            @await Html.PartialAsync("_ClientsTablePartial", Model)
+        </div>
+
+        <div class="tab-pane fade" id="actifs">
+            @await Html.PartialAsync("_ClientsTablePartial", clientsActifs)
+        </div>
+
+        <div class="tab-pane fade" id="inactifs">
+            @await Html.PartialAsync("_ClientsTablePartial", clientsInactifs)
+        </div>
+
+        <div class="tab-pane fade" id="non-verifies">
+            @await Html.PartialAsync("_ClientsTablePartial", clientsNonVerifies)
+        </div>
+    </div>
+</div>

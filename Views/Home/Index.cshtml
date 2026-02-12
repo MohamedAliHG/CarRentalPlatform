@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "Accueil";
+    var offresVedette = ViewBag.OffresVedette as IEnumerable<AgenceLocationVoiture.Models.OffreLoc>;
+    var agencesVedette = ViewBag.AgencesVedette as IEnumerable<AgenceLocationVoiture.Models.Agence>;
+    var offresRecherche = ViewBag.OffresRecherche as IEnumerable<AgenceLocationVoiture.Models.OffreLoc>;
+    var hasSearched = ViewBag.HasSearched as bool?;
+}
+
+<section class="hero text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Trouvez la voiture parfaite pour votre prochain voyage en Tunisie
+                </h1>
+                <p class="lead mb-4">
+                    Explorez la Tunisie en toute liberté avec nos offres de location
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <img src="~/images/logo_2.png" alt="KARHABTI" height="auto" width="auto" class="me-2" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="search-box bg-light py-4">
+    <div class="container">
+        <div class="card shadow">
+            <div class="card-body">
+                <form asp-controller="OffreLoc" asp-action="Index" method="get">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Ville</label>
+                            <input type="text" name="ville" class="form-control" placeholder="Tunis, Djerba..." value="@Context.Request.Query["ville"]" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date de début</label>
+                            <input type="date" name="dateDebut" class="form-control" value="@(Context.Request.Query["dateDebut"].ToString() ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date de fin</label>
+                            <input type="date" name="dateFin" class="form-control" value="@(Context.Request.Query["dateFin"].ToString() ?? DateTime.Now.AddDays(8).ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Rechercher
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a asp-controller="OffreLoc" asp-action="Search" class="text-primary">
+                            <i class="fas fa-sliders-h"></i> Recherche avancée
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (hasSearched == true)
+{
+    <section class="search-results py-5">
+        <div class="container">
+            <h2 class="mb-4">
+                <i class="fas fa-search"></i> Résultats de recherche
+                @if (!string.IsNullOrEmpty(Context.Request.Query["ville"]))
+                {
+                    <text> - @Context.Request.Query["ville"]</text>
+                }
+            </h2>
+
+            @if (offresRecherche != null && offresRecherche.Any())
+            {
+                <div class="alert alert-success mb-4">
+                    <i class="fas fa-check-circle"></i> @offresRecherche.Count() offre(s) trouvée(s)
+                </div>
+
+                <div class="row">
+                    @foreach (var offre in offresRecherche)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                @if (offre.Voiture?.PhotoPrincipaleUrl != null)
+                                {
+                                    <img src="@offre.Voiture.PhotoPrincipaleUrl" class="card-img-top" alt="@offre.Titre" />
+                                }
+
+                                <div class="card-body">
+                                    <h5 class="card-title">@offre.Titre</h5>
+                                    <p class="card-text">
+                                        <i class="fas fa-car"></i> @offre.Voiture?.Marque @offre.Voiture?.Modele<br />
+                                        <i class="fas fa-map-marker-alt"></i> @offre.Agence?.Ville
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h4 text-primary mb-0">@offre.PrixParJour TND/jour</span>
+                                        <a asp-controller="OffreLoc" asp-action="Details" asp-route-id="@offre.Id" 
+                                           class="btn btn-outline-primary">
+                                            Voir détails
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Aucune offre trouvée pour vos critères.
+                    <a asp-controller="OffreLoc" asp-action="Search" class="alert-link">Essayez la recherche avancée</a>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@if ((hasSearched != true) && offresVedette != null && offresVedette.Any())
+{
+    <section class="featured-offers py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">
+                <i class="fas fa-star text-warning"></i> Offres du moment
+            </h2>
+            <div class="row">
+                @foreach (var offre in offresVedette.Take(6))
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            @if (offre.Voiture?.PhotoPrincipaleUrl != null)
+                            {
+                                <img src="@offre.Voiture.PhotoPrincipaleUrl" class="card-img-top" alt="@offre.Titre" />
+                            }
+ 
+                            <div class="card-body">
+                                <h5 class="card-title">@offre.Titre</h5>
+                                <p class="card-text">
+                                    <i class="fas fa-car"></i> @offre.Voiture?.Marque @offre.Voiture?.Modele<br />
+                                    <i class="fas fa-map-marker-alt"></i> @offre.Agence?.Ville
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h4 text-primary mb-0">@offre.PrixParJour TND/jour</span>
+                                    <a asp-controller="OffreLoc" asp-action="Details" asp-route-id="@offre.Id" 
+                                       class="btn btn-outline-primary">
+                                        Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center mt-4">
+                <a asp-controller="OffreLoc" asp-action="Index" class="btn btn-primary btn-lg">
+                    Voir toutes les offres <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+}
+
+@if (hasSearched != true)
+{
+    <section class="benefits py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Pourquoi choisir KARHABTI ?</h2>
+            <div class="row text-center">
+                <div class="col-md-3 mb-4">
+                    <div class="benefit-icon mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                    </div>
+                    <h4>Sécurité garantie</h4>
+                    <p>Toutes nos agences sont vérifiées et certifiées</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="benefit-icon mb-3">
+                        <i class="fas fa-tag fa-3x text-primary"></i>
+                    </div>
+                    <h4>Meilleurs prix</h4>
+                    <p>Comparez et économisez jusqu'à 30%</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="benefit-icon mb-3">
+                        <i class="fas fa-headset fa-3x text-primary"></i>
+                    </div>
+                    <h4>Support 24/7</h4>
+                    <p>Notre équipe est disponible à tout moment</p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="benefit-icon mb-3">
+                        <i class="fas fa-undo fa-3x text-primary"></i>
+                    </div>
+                    <h4>Annulation gratuite</h4>
+                    <p>Modifiez vos plans sans frais</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta bg-primary text-white py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Vous êtes une agence de location ?</h2>
+            <p class="lead mb-4">Rejoignez notre plateforme et développez votre activité</p>
+            <a asp-controller="Account" asp-action="RegisterAgence" class="btn btn-light btn-lg">
+                <i class="fas fa-building"></i> Inscrire mon agence
+            </a>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        });
+
+        document.querySelectorAll('.card').forEach((card) => {
+            observer.observe(card);
+        });
+    </script>
+}

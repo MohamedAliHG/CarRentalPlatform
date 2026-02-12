@@ -1,0 +1,65 @@
+@model IEnumerable<AgenceLocationVoiture.Models.Voiture>
+@{
+    ViewData["Title"] = "Véhicules disponibles";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1><i class="fas fa-car"></i> Véhicules disponibles</h1>
+            <p class="lead">Découvrez notre flotte de véhicules</p>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var voiture in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(voiture.PhotoPrincipaleUrl))
+                        {
+                            <img src="@voiture.PhotoPrincipaleUrl" class="card-img-top" alt="@voiture.Marque @voiture.Modele"  />
+                        }
+   
+                        <div class="card-body">
+                            <h5 class="card-title">@voiture.Marque @voiture.Modele</h5>
+                            <p class="card-text">
+                                <span class="badge bg-primary">@voiture.Categorie</span>
+                                <span class="badge bg-secondary">@voiture.Annee</span>
+                            </p>
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <i class="fas fa-gas-pump text-muted"></i><br />
+                                    <small>@voiture.TypeCarburant</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fas fa-cog text-muted"></i><br />
+                                    <small>@voiture.Transmission</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fas fa-users text-muted"></i><br />
+                                    <small>@voiture.NombrePlaces places</small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">@voiture.Agence?.NomAgence</span>
+                                <a asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-primary">
+                                    Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h4>Aucun véhicule disponible</h4>
+        </div>
+    }
+</div>

@@ -1,0 +1,321 @@
+﻿@model AgenceLocationVoiture.ViewModels.VoitureViewModel
+@{
+    ViewData["Title"] = "Modifier le véhicule";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0"><i class="fas fa-edit"></i> Modifier le véhicule</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="AgenceId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <h5 class="mb-3"><i class="fas fa-info-circle"></i> Informations générales</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Marque" class="form-label">Marque *</label>
+                                <input asp-for="Marque" class="form-control" />
+                                <span asp-validation-for="Marque" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Modele" class="form-label">Modèle *</label>
+                                <input asp-for="Modele" class="form-control" />
+                                <span asp-validation-for="Modele" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Annee" class="form-label">Année *</label>
+                                <input asp-for="Annee" type="number" class="form-control" min="2000" max="2030" />
+                                <span asp-validation-for="Annee" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Immatriculation" class="form-label">Immatriculation *</label>
+                                <input asp-for="Immatriculation" class="form-control" />
+                                <span asp-validation-for="Immatriculation" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Categorie" class="form-label">Catégorie *</label>
+                                <select asp-for="Categorie" class="form-select" asp-items="Html.GetEnumSelectList<AgenceLocationVoiture.Models.CategorieVoiture>()"></select>
+                                <span asp-validation-for="Categorie" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="TypeCarburant" class="form-label">Carburant *</label>
+                                <select asp-for="TypeCarburant" class="form-select" asp-items="Html.GetEnumSelectList<AgenceLocationVoiture.Models.TypeCarburant>()"></select>
+                                <span asp-validation-for="TypeCarburant" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Transmission" class="form-label">Transmission *</label>
+                                <select asp-for="Transmission" class="form-select" asp-items="Html.GetEnumSelectList<AgenceLocationVoiture.Models.TypeTransmission>()"></select>
+                                <span asp-validation-for="Transmission" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="NombrePlaces" class="form-label">Nombre de places *</label>
+                                <input asp-for="NombrePlaces" type="number" class="form-control" min="2" max="9" />
+                                <span asp-validation-for="NombrePlaces" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="NombrePortes" class="form-label">Nombre de portes *</label>
+                                <input asp-for="NombrePortes" type="number" class="form-control" min="2" max="5" />
+                                <span asp-validation-for="NombrePortes" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Couleur" class="form-label">Couleur *</label>
+                                <input asp-for="Couleur" class="form-control" />
+                                <span asp-validation-for="Couleur" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Kilometrage" class="form-label">Kilométrage *</label>
+                            <input asp-for="Kilometrage" type="number" class="form-control" step="0.01" />
+                            <span asp-validation-for="Kilometrage" class="text-danger"></span>
+                        </div>
+
+                        <h5 class="mb-3 mt-4"><i class="fas fa-images"></i> Photos du véhicule</h5>
+                        
+                        <div class="mb-3">
+                            <label asp-for="PhotoPrincipaleFile" class="form-label">
+                                <i class="fas fa-upload"></i> Nouvelle photo principale
+                            </label>
+                            <input asp-for="PhotoPrincipaleFile" type="file" class="form-control" accept="image/*" id="photoPrincipale" />
+                            <small class="form-text text-muted">
+                                Laissez vide pour conserver la photo actuelle
+                            </small>
+                            @if (!string.IsNullOrEmpty(Model.PhotoPrincipaleUrl))
+                            {
+                                <div class="mt-2">
+                                    <img src="@Model.PhotoPrincipaleUrl" class="img-thumbnail" style="max-width: 200px;" alt="Photo actuelle" />
+                                    <p class="text-muted small">Photo actuelle</p>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ou modifier l'URL</label>
+                            <input asp-for="PhotoPrincipaleUrl" class="form-control" placeholder="https://..." />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhotosFiles" class="form-label">
+                                <i class="fas fa-images"></i> Ajouter des photos supplémentaires
+                            </label>
+                            <input asp-for="PhotosFiles" type="file" class="form-control" accept="image/*" multiple id="photosSupplementaires" />
+                            <small class="form-text text-muted">
+                                Ces photos seront ajoutées aux photos existantes
+                            </small>
+                        </div>
+
+                        <hr class="my-4" />
+                        <div class="form-check mb-3">
+                            <input asp-for="AjouterFicheTechnique" type="checkbox" class="form-check-input" id="ajouterFicheTechnique" />
+                            <label asp-for="AjouterFicheTechnique" class="form-check-label">
+                                <strong>Modifier la fiche technique détaillée</strong>
+                                <small class="text-muted d-block">
+                                    @if (Model.AjouterFicheTechnique)
+                                    {
+                                        <span class="text-success">Une fiche technique existe déjà</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Cochez pour ajouter ou modifier les informations techniques</span>
+                                    }
+                                </small>
+                            </label>
+                        </div>
+
+                        <div id="ficheTechniqueSection" style="display: @(Model.AjouterFicheTechnique ? "block" : "none");">
+                            <h5 class="mb-3"><i class="fas fa-cog"></i> Fiche technique</h5>
+
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong><i class="fas fa-engine"></i> Moteur et performances</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="MoteurType" class="form-label"></label>
+                                            <input asp-for="MoteurType" class="form-control" placeholder="Ex: 1.5 dCi 110ch" />
+                                            <span asp-validation-for="MoteurType" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="Puissance" class="form-label"></label>
+                                            <input asp-for="Puissance" type="number" class="form-control" placeholder="Ex: 110" />
+                                            <span asp-validation-for="Puissance" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="Consommation" class="form-label"></label>
+                                            <input asp-for="Consommation" type="number" step="0.1" class="form-control" placeholder="Ex: 5.2" />
+                                            <span asp-validation-for="Consommation" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="EmissionCO2" class="form-label"></label>
+                                            <input asp-for="EmissionCO2" type="number" step="0.1" class="form-control" placeholder="Ex: 135" />
+                                            <span asp-validation-for="EmissionCO2" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong><i class="fas fa-ruler-combined"></i> Capacités et dimensions</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="CapaciteReservoir" class="form-label"></label>
+                                            <input asp-for="CapaciteReservoir" type="number" class="form-control" placeholder="Ex: 50" />
+                                            <span asp-validation-for="CapaciteReservoir" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="VolumeCodeffre" class="form-label"></label>
+                                            <input asp-for="VolumeCodeffre" type="number" class="form-control" placeholder="Ex: 380" />
+                                            <span asp-validation-for="VolumeCodeffre" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label asp-for="Longueur" class="form-label"></label>
+                                            <input asp-for="Longueur" type="number" step="0.01" class="form-control" placeholder="Ex: 4.33" />
+                                            <span asp-validation-for="Longueur" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label asp-for="Largeur" class="form-label"></label>
+                                            <input asp-for="Largeur" type="number" step="0.01" class="form-control" placeholder="Ex: 1.81" />
+                                            <span asp-validation-for="Largeur" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label asp-for="Hauteur" class="form-label"></label>
+                                            <input asp-for="Hauteur" type="number" step="0.01" class="form-control" placeholder="Ex: 1.45" />
+                                            <span asp-validation-for="Hauteur" class="text-danger"></span>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label asp-for="PoidsVide" class="form-label"></label>
+                                            <input asp-for="PoidsVide" type="number" step="0.1" class="form-control" placeholder="Ex: 1250" />
+                                            <span asp-validation-for="PoidsVide" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong><i class="fas fa-list"></i> Équipements et sécurité</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label asp-for="Equipements" class="form-label"></label>
+                                        <textarea asp-for="Equipements" class="form-control" rows="3" 
+                                                  placeholder="Ex: Climatisation automatique, GPS intégré, Régulateur de vitesse, Bluetooth, etc."></textarea>
+                                        <span asp-validation-for="Equipements" class="text-danger"></span>
+                                        <small class="form-text text-muted">Séparez les équipements par des virgules</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label asp-for="OptionsSecurite" class="form-label"></label>
+                                        <textarea asp-for="OptionsSecurite" class="form-control" rows="3" 
+                                                  placeholder="Ex: ABS, ESP, Airbags frontaux et latéraux, ISOFIX, etc."></textarea>
+                                        <span asp-validation-for="OptionsSecurite" class="text-danger"></span>
+                                        <small class="form-text text-muted">Séparez les options par des virgules</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input asp-for="EstDisponible" type="checkbox" class="form-check-input" />
+                            <label asp-for="EstDisponible" class="form-check-label">Véhicule disponible</label>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Agence" asp-action="Dashboard" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Mettre à jour
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.getElementById('ajouterFicheTechnique').addEventListener('change', function() {
+            const section = document.getElementById('ficheTechniqueSection');
+            section.style.display = this.checked ? 'block' : 'none';
+        });
+
+        const photoPrincipaleInput = document.getElementById('photoPrincipale');
+        if (photoPrincipaleInput) {
+            photoPrincipaleInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        let preview = document.querySelector('#photoPrincipale + .mt-2');
+                        if (!preview) {
+                            preview = document.createElement('div');
+                            preview.className = 'mt-2';
+                            photoPrincipaleInput.parentNode.appendChild(preview);
+                        }
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" class="img-thumbnail" style="max-width: 200px;" alt="Nouvelle photo" />
+                            <p class="text-success small">Nouvelle photo sélectionnée</p>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        const photosSupplementairesInput = document.getElementById('photosSupplementaires');
+        if (photosSupplementairesInput) {
+            photosSupplementairesInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    let preview = photosSupplementairesInput.nextElementSibling.nextElementSibling;
+                    if (!preview || !preview.classList.contains('row')) {
+                        preview = document.createElement('div');
+                        preview.className = 'row mt-2';
+                        photosSupplementairesInput.parentNode.appendChild(preview);
+                    }
+                    preview.innerHTML = '';
+                    
+                    files.forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const col = document.createElement('div');
+                            col.className = 'col-3 mb-2';
+                            col.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="width: 100%;" />`;
+                            preview.appendChild(col);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+        }
+    </script>
+}

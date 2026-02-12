@@ -1,0 +1,226 @@
+﻿@model AgenceLocationVoiture.Models.Voiture
+@{
+    ViewData["Title"] = $"{Model.Marque} {Model.Modele}";
+    var offres = ViewBag.Offres as IEnumerable<AgenceLocationVoiture.Models.OffreLoc>;
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-7">
+            <div id="carouselVoiture" class="carousel slide mb-3" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @if (!string.IsNullOrEmpty(Model.PhotoPrincipaleUrl))
+                    {
+                        <div class="carousel-item active">
+                            <img src="@Model.PhotoPrincipaleUrl" class="d-block w-100 rounded" alt="@Model.Marque @Model.Modele" 
+                                 style="height: 400px; object-fit: cover;" />
+                        </div>
+                    }
+                    @if (Model.PhotosUrls != null && Model.PhotosUrls.Any())
+                    {
+                        @foreach (var photo in Model.PhotosUrls)
+                        {
+                            <div class="carousel-item">
+                                <img src="@photo" class="d-block w-100 rounded" alt="Photo" style="height: 400px; object-fit: cover;" />
+                            </div>
+                        }
+                    }
+                </div>
+                @if ((Model.PhotosUrls?.Count ?? 0) > 0)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselVoiture" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselVoiture" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                }
+            </div>
+
+            @if (Model.FicheTechnique != null)
+            {
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-cog"></i> Fiche technique détaillée</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="text-primary mb-3"><i class="fas fa-engine"></i> Moteur et performances</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-cogs"></i> Type de moteur :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.MoteurType</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-tachometer-alt"></i> Puissance :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.Puissance ch</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-gas-pump"></i> Consommation :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.Consommation L/100km</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-leaf"></i> Émission CO2 :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.EmissionCO2 g/km</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6 class="text-primary mb-3"><i class="fas fa-fill-drip"></i> Capacités</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-fill-drip"></i> Capacité réservoir :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.CapaciteReservoir L</span>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <strong><i class="fas fa-suitcase"></i> Volume coffre :</strong> 
+                                <span class="text-muted">@Model.FicheTechnique.VolumeCodeffre L</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6 class="text-primary mb-3"><i class="fas fa-ruler-combined"></i> Dimensions et poids</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-3 mb-2">
+                                <strong><i class="fas fa-arrows-alt-h"></i> Longueur :</strong><br />
+                                <span class="text-muted">@Model.FicheTechnique.Longueur m</span>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <strong><i class="fas fa-arrows-alt-h"></i> Largeur :</strong><br />
+                                <span class="text-muted">@Model.FicheTechnique.Largeur m</span>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <strong><i class="fas fa-arrows-alt-v"></i> Hauteur :</strong><br />
+                                <span class="text-muted">@Model.FicheTechnique.Hauteur m</span>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <strong><i class="fas fa-weight"></i> Poids à vide :</strong><br />
+                                <span class="text-muted">@Model.FicheTechnique.PoidsVide kg</span>
+                            </div>
+                        </div>
+
+                       
+
+                        @if (!string.IsNullOrEmpty(Model.FicheTechnique.Equipements))
+                        {
+                            <hr />
+                            <h6 class="text-primary mb-3"><i class="fas fa-list"></i> Équipements et confort</h6>
+                            <div class="alert alert-info">
+                                @{
+                                    var equipements = Model.FicheTechnique.Equipements.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                }
+                                <ul class="mb-0">
+                                    @foreach (var equipement in equipements)
+                                    {
+                                        <li>@equipement.Trim()</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.FicheTechnique.OptionsSecurite))
+                        {
+                            <hr />
+                            <h6 class="text-primary mb-3"><i class="fas fa-shield-alt"></i> Sécurité</h6>
+                            <div class="alert alert-success">
+                                @{
+                                    var optionsSecurite = Model.FicheTechnique.OptionsSecurite.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                }
+                                <ul class="mb-0">
+                                    @foreach (var option in optionsSecurite)
+                                    {
+                                        <li>@option.Trim()</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aucune fiche technique détaillée n'est disponible pour ce véhicule.
+                </div>
+            }
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h2 class="mb-3">@Model.Marque @Model.Modele</h2>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-primary fs-6">@Model.Categorie</span>
+                        <span class="badge bg-secondary fs-6">@Model.Annee</span>
+                        @if (Model.EstDisponible)
+                        {
+                            <span class="badge bg-success fs-6">Disponible</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6">Indisponible</span>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <h5 class="mb-3">Caractéristiques</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-palette text-primary"></i> <strong>Couleur :</strong> @Model.Couleur
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-gas-pump text-primary"></i> <strong>Carburant :</strong> @Model.TypeCarburant
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-cog text-primary"></i> <strong>Transmission :</strong> @Model.Transmission
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-users text-primary"></i> <strong>Places :</strong> @Model.NombrePlaces
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-door-closed text-primary"></i> <strong>Portes :</strong> @Model.NombrePortes
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-road text-primary"></i> <strong>Kilométrage :</strong> @Model.Kilometrage.ToString("N0") km
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-id-card text-primary"></i> <strong>Immatriculation :</strong> @Model.Immatriculation
+                        </li>
+                    </ul>
+
+                    <hr />
+
+                    <h5 class="mb-3">Agence</h5>
+                    <p class="mb-2">
+                        <i class="fas fa-building text-primary"></i> <strong>@Model.Agence?.NomAgence</strong>
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt text-primary"></i> @Model.Agence?.Ville
+                    </p>
+                    <a asp-controller="Agence" asp-action="Details" asp-route-id="@Model.AgenceId" class="btn btn-outline-primary btn-sm">
+                        Voir l'agence
+                    </a>
+
+                    @if (Model.EstDisponible && offres != null && offres.Any())
+                    {
+                        <hr />
+                        <h5 class="mb-3">Offres disponibles</h5>
+                        @foreach (var offre in offres.Take(3))
+                        {
+                            <div class="border rounded p-2 mb-2">
+                                <strong>@offre.Titre</strong><br />
+                                <span class="text-primary h5">@offre.PrixParJour TND/jour</span><br />
+                                <a asp-controller="OffreLoc" asp-action="Details" asp-route-id="@offre.Id" class="btn btn-sm btn-primary mt-1">
+                                    Voir l'offre
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
